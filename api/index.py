@@ -8,7 +8,6 @@ import uvicorn
 import os
 import yaml
 import uuid
-import sys
 import os
 from pathlib import Path
 from evals import run, get_parser
@@ -16,7 +15,7 @@ from evals import run, get_parser
 # get endpoint
 app = FastAPI()
 
-@app.get("/evals")
+@app.get("/api/evals")
 def get_evals():
     path = "evals/evals/registry/evals"
     if not Path(path).is_dir():
@@ -25,7 +24,7 @@ def get_evals():
     files = [f.split('.')[0] for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     return {"evals": files} 
     
-@app.post("/evals/run")
+@app.post("/api/evals/run")
 async def run_eval(request: Request):
     authorization_header = request.headers.get("Authorization")
     if not authorization_header or not authorization_header.startswith("Bearer "):
@@ -47,9 +46,7 @@ async def run_eval(request: Request):
         return lines[-1]
     else:
         raise HTTPException(status_code=500, detail="No eval response generated")
-    
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+
 
 
 # @app.get("/evals/{eval_id}")
